@@ -1,0 +1,9 @@
+/node_modules
+/vendor
+.env
+.env.backup
+.phpunit.result.cache
+/.idea
+/.vscode
+*.zip
+composer.phar
