@@ -1,4 +1,4 @@
-create table users
+CREATE TABLE IF NOT EXISTS users
 (
     id          int auto_increment
         primary key,
@@ -9,7 +9,7 @@ create table users
         unique (webauthn_id)
 );
 
-create table users_webauthn_credentials
+CREATE TABLE IF NOT EXISTS users_webauthn_credentials
 (
     id                int auto_increment
         primary key,
