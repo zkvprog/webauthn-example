@@ -10,10 +10,10 @@ services:
             - '.:/application'
             - ./dump:/docker-entrypoint-initdb.d
         environment:
-            - MYSQL_ROOT_PASSWORD=root
-            - MYSQL_DATABASE=webauthn
-            - MYSQL_USER=webauthn
-            - MYSQL_PASSWORD=webauthn
+            - MYSQL_ROOT_PASSWORD=${MYSQL_ROOT_PASSWORD}
+            - MYSQL_DATABASE=${DB_DATABSE}
+            - MYSQL_USER=${DB_USER}
+            - MYSQL_PASSWORD=${DB_PASSWORD}
         ports:
             - '64002:3306'
 
