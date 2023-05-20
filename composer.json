@@ -6,7 +6,8 @@
         }
     },
     "require": {
-        "lbuchs/webauthn": "^1.1"
+        "lbuchs/webauthn": "~2.0",
+        "vlucas/phpdotenv": "^5.5"
     },
     "config": {
         "platform-check": false
