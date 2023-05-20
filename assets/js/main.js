@@ -1,5 +1,5 @@
-import {WebAuthnConfig} from './WebAuthnConfig';
-import {WebAuthn} from './WebAuthn';
+import {WebAuthnConfig} from './WebAuthnConfig.js';
+import {WebAuthn} from './WebAuthn.js';
 
 let config = new WebAuthnConfig();
 config.getRegisterArgsEndpoint += "webauthn_get_args.php?cmd=getRegisterArgs";
