@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <title>Title</title>
-    <link rel="stylesheet" href="css/main.css">
+    <link rel="stylesheet" href="assets/css/main.css">
 </head>
 <body>
 <div class="container">
@@ -27,8 +27,8 @@
             <button class="btn" type="button" onclick="_webAuthn.authenticate()">Log in with Webauthn</button>
         </div>
     </form>
-    <script src="js/index.js"></script>
-    <script type="module" src="js/main.js"></script>
+    <script src="assets/js/index.js"></script>
+    <script type="module" src="assets/js/main.js"></script>
 </div>
 </body>
 </html>
