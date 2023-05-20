@@ -12,7 +12,7 @@ class View implements RenderableInterface
         return $this;
     }
 
-    public function render(): false|string
+    public function render(): void
     {
         extract($this->data);
 
@@ -23,7 +23,7 @@ class View implements RenderableInterface
             $content = ob_get_contents();
             ob_end_clean();
 
-            return $content;
+            echo $content;
         } else {
             throw new ApplicationException($this->template . ' шаблон не найден');
         }
