@@ -2,6 +2,7 @@
 namespace App\System;
 
 use App\Exception\ApplicationException;
+use App\System\Interfaces\JsonResponseInterface;
 use App\System\Interfaces\RenderableInterface;
 
 class System
@@ -20,6 +21,8 @@ class System
 
             if ($out instanceof RenderableInterface) {
                 $out->render();
+            } else if ($out instanceof JsonResponseInterface) {
+                $out->sendResponse();
             } else {
                 echo $out;
             }

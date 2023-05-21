@@ -1,10 +1,28 @@
 <?php
 
-namespace App;
+namespace App\System;
 
-class ResponseJson
+use App\System\Interfaces\JsonResponseInterface;
+use JsonSerializable;
+
+class ResponseJson implements JsonResponseInterface, JsonSerializable
 {
-    public static function sendSuccess(string $msg = '', $body = false)
+    public function __construct(public bool $success = false, public string $message = '', public string $result = '')
+    {
+    }
+
+    public function sendResponse()
+    {
+        header('Content-Type: application/json');
+        print(json_encode($this));
+    }
+
+    public function jsonSerialize()
+    {
+        return get_object_vars($this);
+    }
+
+    /*public static function sendSuccess(string $msg = '', $body = false)
     {
         self::send(true, $msg, $body);
     }
@@ -33,8 +51,9 @@ class ResponseJson
         }
     }
 
-    public static function isJson($string) {
+    public static function isJson($string)
+    {
         json_decode($string);
         return json_last_error() === JSON_ERROR_NONE;
-    }
+    }*/
 }
