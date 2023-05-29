@@ -16,7 +16,10 @@ CREATE TABLE IF NOT EXISTS users_webauthn_credentials
     credential_id     varchar(128) not null,
     user_id           int          not null,
     publickey         text         not null,
-    signature_counter varchar(100) null
+    signature_counter varchar(100) null,
+    constraint users_webauthn_credentials_users_id_fk
+        foreign key (user_id) references users (id)
+            on delete cascade
 );
 
 create index user_id
