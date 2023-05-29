@@ -90,7 +90,7 @@ class WebAuthn {
         if (this.isSupportLibrary() && this.isSupportWebAuthn()) {
             try {
                 const authenticateArgs = await window.fetch(this.config.getAuthenticateArgsEndpoint, {
-                    method: 'Post',
+                    method: 'GET',
                     cache:'no-cache',
                 });
 
@@ -100,9 +100,10 @@ class WebAuthn {
                     throw new Error(createArgs.msg || 'unknown error occured');
                 }
 
-                WebAuthn.recursiveBase64StrToArrayBuffer(authenticateArgsResponse);
+                let authArgsResult = authenticateArgsResponse.result;
+                WebAuthn.recursiveBase64StrToArrayBuffer(authArgsResult);
 
-                const credential = await navigator.credentials.get(authenticateArgsResponse);
+                const credential = await navigator.credentials.get(authArgsResult);
 
                 const authenticatorAttestationResponse = {
                     id: credential.rawId ? WebAuthn.arrayBufferToBase64(credential.rawId) : null,
@@ -139,9 +140,10 @@ class WebAuthn {
                     throw new Error(createArgs.msg || 'unknown error occured');
                 }
 
-                WebAuthn.recursiveBase64StrToArrayBuffer(regArgsResponse);
+                let regArgsResult = regArgsResponse.result;
+                WebAuthn.recursiveBase64StrToArrayBuffer(regArgsResult);
 
-                const credential = await navigator.credentials.create(regArgsResponse);
+                const credential = await navigator.credentials.create(regArgsResult);
 
                 const authenticatorAttestationResponse = {
                     id: credential.id,

@@ -11,8 +11,6 @@ class AuthController
     public function signup(): ResponseJson
     {
         try {
-            session_start();
-
             $pdo = DbConnector::getPdoInstance();
             $stmt = $pdo->prepare("INSERT INTO users (name, webauthn_id, password) VALUES(?, ?, ?)");
             $stmt->execute([$_POST['username'], bin2hex(random_bytes(16)), password_hash($_POST['password'], PASSWORD_DEFAULT )]);
@@ -54,7 +52,6 @@ class AuthController
     public function logout()
     {
         try {
-            session_start();
             session_destroy();
 
             return new ResponseJson(true, 'logout success');

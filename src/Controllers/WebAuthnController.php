@@ -56,13 +56,10 @@ class WebAuthnController
     {
         try {
             $WebAuthn = new WebAuthnAdapter('Localhost', 'localhost');
-
             $cmd = filter_input(INPUT_GET, 'cmd');
-
             $pdo = DbConnector::getPdoInstance();
 
-            if ($cmd == 'getRegisterArgs') {
-
+            if ($cmd === 'getRegisterArgs') {
                 #region init user and user_credentials
                 if ($_SESSION['user_id']) {
                     $stmt = $pdo->prepare("SELECT id, name, webauthn_id FROM users WHERE id=?");
@@ -82,7 +79,7 @@ class WebAuthnController
                 #endregion
 
                 $args = $WebAuthn->getRegisterArgs($userId, $userName, $userDisplayName);
-            } elseif ($cmd == 'getAuthenticateArgs')  {
+            } elseif ($cmd === 'getAuthenticateArgs')  {
                 $args = $WebAuthn->getAuthenticateArgs(null);
             } else {
                 throw new \Exception('unknown cmd');
