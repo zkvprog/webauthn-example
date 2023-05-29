@@ -32,3 +32,14 @@ services:
         volumes:
             - '.:/application'
             - './phpdocker/php-fpm/php-ini-overrides.ini:/etc/php/8.2/fpm/conf.d/99-overrides.ini'
+        depends_on:
+            - webserver
+
+    npm:
+        image: node:latest
+        volumes:
+            - '.:/application'
+        working_dir: /application
+        depends_on:
+            - php-fpm
+        tty: true
