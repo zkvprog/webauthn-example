@@ -67,3 +67,8 @@ async function logout(event) {
     }
 }
 
+window.onload = (event) => {
+    document.getElementById("registerBtn").addEventListener("click", registerUser);
+    document.getElementById("authBtn").addEventListener("click", authUser);
+    document.getElementById("logoutBtn").addEventListener("click", logout);
+};

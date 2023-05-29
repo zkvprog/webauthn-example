@@ -182,7 +182,7 @@ class WebAuthn {
             console.log(message);
         }
 
-        successFunc();
+        successFunc(message);
     }
 
     /**
@@ -195,7 +195,7 @@ class WebAuthn {
             console.error(error);
         }
 
-        errorFunc();
+        errorFunc(error);
     }
 }
 

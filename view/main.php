@@ -3,7 +3,6 @@
 <head>
     <meta charset="UTF-8">
     <title>Title</title>
-    <link rel="stylesheet" href="assets/css/main.css">
 </head>
 <body>
 <div class="container">
@@ -19,16 +18,15 @@
                    autocomplete="username webauthn">
         </div>
         <div class="button-list" style="margin-top: 10px">
-            <button class="btn" type="button" onclick="registerUser(event)">Sign up</button>
-            <button class="btn" type="button" onclick="authUser(event)">Log in</button>
+            <button class="btn" type="button" id="registerBtn">Sign up</button>
+            <button class="btn" type="button" id="authBtn">Log in</button>
         </div>
         <hr>
         <div class="button-list" style="margin-top: 10px">
             <button class="btn" type="button" onclick="_webAuthn.authenticate()">Log in with Webauthn</button>
         </div>
     </form>
-    <script src="assets/js/index.js"></script>
-    <script type="module" src="assets/js/main.js"></script>
+    <script src="/public/bundle.js"></script>
 </div>
 </body>
 </html>
