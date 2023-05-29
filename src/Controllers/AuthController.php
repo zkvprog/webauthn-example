@@ -3,6 +3,7 @@
 namespace App\Controllers;
 
 use App\Db\DbConnector;
+use App\Exception\ApplicationException;
 use App\System\ResponseJson;
 use Throwable;
 
@@ -12,6 +13,14 @@ class AuthController
     {
         try {
             $pdo = DbConnector::getPdoInstance();
+
+            $stmt = $pdo->prepare("SELECT id FROM users WHERE name=?");
+            $stmt->execute([$_POST['username']]);
+            $existingUser = $stmt->fetch();
+            if (isset($existingUser)) {
+                throw new ApplicationException('user with this name already exists');
+            }
+
             $stmt = $pdo->prepare("INSERT INTO users (name, webauthn_id, password) VALUES(?, ?, ?)");
             $stmt->execute([$_POST['username'], bin2hex(random_bytes(16)), password_hash($_POST['password'], PASSWORD_DEFAULT )]);
 
@@ -37,10 +46,10 @@ class AuthController
                     $_SESSION['user_id'] = $user['id'];
                     $_SESSION['user_name'] = $user['name'];
                 } else {
-                    throw new \Exception('incorrect password');
+                    throw new ApplicationException('incorrect password');
                 }
             } else {
-                throw new \Exception('undefined user');
+                throw new ApplicationException('undefined user');
             }
 
             return new ResponseJson(true, 'authentication success');

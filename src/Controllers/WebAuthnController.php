@@ -3,6 +3,7 @@
 namespace App\Controllers;
 
 use App\Db\DbConnector;
+use App\Exception\ApplicationException;
 use App\System\ResponseJson;
 use App\Webauthn\WebAuthnAdapter;
 use lbuchs\WebAuthn\WebAuthn;
@@ -35,7 +36,7 @@ class WebAuthnController
             $credentialInfo = $stmt->fetch();
 
             if ($credentialInfo === null) {
-                throw new \Exception('Public Key for credential ID not found!');
+                throw new ApplicationException('Public Key for credential ID not found!');
             }
 
             $result = $WebAuthn->processGet($clientDataJSON, $authenticatorData, $signature, $credentialInfo['publickey'], $challenge, null, 'false');
@@ -43,7 +44,7 @@ class WebAuthnController
                 $_SESSION['user_id'] = $credentialInfo['user_id'];
                 $_SESSION['user_name'] = $credentialInfo['user_id'];
             } else {
-                throw new \Exception('Unsuccess authenticate');
+                throw new ApplicationException('Unsuccess authenticate');
             }
 
             return new ResponseJson(true, 'got passkey success');
@@ -74,7 +75,7 @@ class WebAuthnController
                     $stmt->execute([$_SESSION['user_id']]);
                     $users_webauthn_credentials = $stmt->fetch();
                 } else {
-                    throw new \Exception('undefined user');
+                    throw new ApplicationException('undefined user');
                 }
                 #endregion
 
@@ -82,7 +83,7 @@ class WebAuthnController
             } elseif ($cmd === 'getAuthenticateArgs')  {
                 $args = $WebAuthn->getAuthenticateArgs(null);
             } else {
-                throw new \Exception('unknown cmd');
+                throw new ApplicationException('unknown cmd');
             }
 
             $_SESSION['webauthn_challenge'] = $WebAuthn->getChallenge();
@@ -108,7 +109,7 @@ class WebAuthnController
                 $user = $stmt->fetch();
 
                 if (!$user) {
-                    throw new \Exception('undefined user');
+                    throw new ApplicationException('undefined user');
                 }
 
                 $WebAuthn = new WebAuthnAdapter('Localhost', 'localhost');
@@ -124,7 +125,7 @@ class WebAuthnController
 
                 return new ResponseJson(true, 'registration passkey success');
             } else {
-                throw new \Exception('undefined user');
+                throw new ApplicationException('undefined user');
             }
         } catch (Throwable $ex) {
             return new ResponseJson(false, $ex->getMessage());
