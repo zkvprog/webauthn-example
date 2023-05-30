@@ -19,8 +19,7 @@ class WebAuthnController
                 $post = json_decode($post);
             }
 
-            $rpId = 'localhost';
-            $WebAuthn = new WebAuthn('localhost', $rpId);
+            $WebAuthn = new WebAuthn($_ENV['APP_NAME'], $_ENV['DOMAIN_NAME']);
 
             $clientDataJSON = base64_decode($post->clientDataJSON);
             $authenticatorData = base64_decode($post->authenticatorData);
@@ -56,7 +55,7 @@ class WebAuthnController
     public function getArgs()
     {
         try {
-            $WebAuthn = new WebAuthnAdapter('Localhost', 'localhost');
+            $WebAuthn = new WebAuthnAdapter($_ENV['APP_NAME'], $_ENV['DOMAIN_NAME']);
             $cmd = filter_input(INPUT_GET, 'cmd');
             $pdo = DbConnector::getPdoInstance();
 
@@ -112,7 +111,7 @@ class WebAuthnController
                     throw new ApplicationException('undefined user');
                 }
 
-                $WebAuthn = new WebAuthnAdapter('Localhost', 'localhost');
+                $WebAuthn = new WebAuthnAdapter($_ENV['APP_NAME'], $_ENV['DOMAIN_NAME']);
 
                 $clientDataJSON = base64_decode($post->clientDataJSON);
                 $attestationObject = base64_decode($post->attestationObject);
