@@ -1,8 +1,8 @@
 async function registerUser(event) {
-    try {
-        let form = event.target.closest('form');
-        let errorPanel = form.querySelector('.form-error')
+    const form = event.target.closest('form');
+    const errorPanel = form.querySelector('.form-error');
 
+    try {
         if (form.checkValidity()) {
             let register = await window.fetch('signup', {
                 method  : 'POST',
@@ -14,21 +14,22 @@ async function registerUser(event) {
             if (register.success) {
                 window.location.reload();
             } else {
-                throw new Error(register.msg);
+                throw new Error(register.message);
             }
         } else {
             errorPanel.textContent = 'Check your form';
         }
     } catch(err) {
         console.error(err);
+        errorPanel.textContent = err;
     }
 }
 
 async function authUser(event) {
-    try {
-        const form = event.target.closest('form');
-        const errorPanel = form.querySelector('.form-error')
+    const form = event.target.closest('form');
+    const errorPanel = form.querySelector('.form-error')
 
+    try {
         if (form.checkValidity()) {
             const auth = await window.fetch('login', {
                 method  : 'POST',
@@ -40,13 +41,14 @@ async function authUser(event) {
             if (authResponse.success) {
                 window.location.reload();
             } else {
-                throw new Error(authResponse.msg);
+                throw new Error(authResponse.message);
             }
         } else {
             errorPanel.textContent = 'Check your form';
         }
     } catch(err) {
         console.error(err);
+        errorPanel.textContent = err;
     }
 }
 

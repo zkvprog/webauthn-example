@@ -7,11 +7,6 @@ import {WebAuthn} from './WebAuthn.js';
 import Toastify from 'toastify-js'
 import "toastify-js/src/toastify.css"
 
-Toastify({
-    text: "This is a toast",
-    duration: 3000
-}).showToast();
-
 let config = new WebAuthnConfig();
 config.getRegisterArgsEndpoint += "webauthn_get_args?cmd=getRegisterArgs";
 config.registerEndpoint += "webauthn_register";
@@ -19,13 +14,17 @@ config.registerSuccess = function (message) {
     Toastify({
         text: message,
         duration: 3000,
-        newWindow: true,
-        close: true,
-        gravity: "top", // `top` or `bottom`
-        position: "left", // `left`, `center` or `right`
-        stopOnFocus: true, // Prevents dismissing of toast on hover
         style: {
             background: "linear-gradient(to right, #00b09b, #96c93d)",
+        }
+    }).showToast();
+};
+config.registerFail = function (error) {
+    Toastify({
+        text: error,
+        duration: 3000,
+        style: {
+            background: "linear-gradient(to right, #ff5f6d, #ffc371)",
         }
     }).showToast();
 };

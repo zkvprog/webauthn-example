@@ -8,3 +8,4 @@
 *.zip
 composer.phar
 assets/test
+public
