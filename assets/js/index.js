@@ -70,7 +70,19 @@ async function logout(event) {
 }
 
 window.onload = (event) => {
-    document.getElementById("registerBtn").addEventListener("click", registerUser);
-    document.getElementById("authBtn").addEventListener("click", authUser);
-    document.getElementById("logoutBtn").addEventListener("click", logout);
+    const registerBtn = document.getElementById("registerBtn");
+    const authBtn = document.getElementById("authBtn");
+    const logoutBtn = document.getElementById("logoutBtn");
+
+    if (registerBtn) {
+        registerBtn.addEventListener("click", registerUser);
+    }
+
+    if (authBtn) {
+        authBtn.addEventListener("click", authUser);
+    }
+
+    if (logoutBtn) {
+        logoutBtn.addEventListener("click", logout);
+    }
 };
