@@ -2,7 +2,7 @@
 
 namespace App\Db;
 
-class DbConnector
+class PdoConnector implements DbConnector
 {
     public static function getPdoInstance()
     {
