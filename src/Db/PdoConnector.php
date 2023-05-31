@@ -2,9 +2,11 @@
 
 namespace App\Db;
 
+use App\System\Interfaces\DbConnector;
+
 class PdoConnector implements DbConnector
 {
-    public static function getPdoInstance()
+    public static function getInstance(): \PDO
     {
         $dsn = "mysql:host={$_ENV['DB_HOST']};port={$_ENV['DB_PORT']};dbname={$_ENV['DB_DATABSE']};charset=utf8";
 
