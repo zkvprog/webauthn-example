@@ -2,8 +2,8 @@
 
 namespace App\Controllers;
 
-use App\Db\DbConnector;
 use App\Exception\ApplicationException;
+use App\Repositories\UserRepository;
 use App\System\ResponseJson;
 use Throwable;
 
@@ -12,19 +12,18 @@ class AuthController
     public function signup(): ResponseJson
     {
         try {
-            $pdo = DbConnector::getPdoInstance();
+            $userRepository = new UserRepository();
+            $existingUser = $userRepository->read('name=:name', ['name' => $_POST['username']]);
 
-            $stmt = $pdo->prepare("SELECT id FROM users WHERE name=?");
-            $stmt->execute([$_POST['username']]);
-            $existingUser = $stmt->fetch();
-            if (isset($existingUser)) {
+            if (!empty($existingUser)) {
                 throw new ApplicationException('user with this name already exists');
             }
 
-            $stmt = $pdo->prepare("INSERT INTO users (name, webauthn_id, password) VALUES(?, ?, ?)");
-            $stmt->execute([$_POST['username'], bin2hex(random_bytes(16)), password_hash($_POST['password'], PASSWORD_DEFAULT )]);
-
-            $_SESSION['user_id'] = $pdo->lastInsertId();
+            $_SESSION['user_id'] = $userRepository->create([
+                'name' => $_POST['username'],
+                'webauthn_id' => bin2hex(random_bytes(16)),
+                'password' => password_hash($_POST['password'], PASSWORD_DEFAULT )
+            ]);
             $_SESSION['user_name'] = $_POST['username'];
 
             return new ResponseJson(true, 'registration success');
@@ -33,15 +32,17 @@ class AuthController
         }
     }
 
-    public function login()
+    public function login(): ResponseJson
     {
         try {
-            $pdo = DbConnector::getPdoInstance();
-            $stmt = $pdo->prepare("SELECT id, name, password FROM users WHERE name=?");
-            $stmt->execute([$_POST['username']]);
-            $user = $stmt->fetch();
+            $userRepository = new UserRepository();
+            $user = $userRepository->read(
+                condition: 'name=:name',
+                params: ['name' => $_POST['username']],
+                readOne: true
+            );
 
-            if (isset($user)) {
+            if (!empty($user)) {
                 if (password_verify($_POST['password'], $user['password'])) {
                     $_SESSION['user_id'] = $user['id'];
                     $_SESSION['user_name'] = $user['name'];
@@ -58,7 +59,7 @@ class AuthController
         }
     }
 
-    public function logout()
+    public function logout(): ResponseJson
     {
         try {
             session_destroy();

@@ -2,7 +2,7 @@
 
 namespace App\Controllers;
 
-use App\Db\DbConnector;
+use App\Db\PdoConnector;
 use App\Exception\ApplicationException;
 use App\System\ResponseJson;
 use App\Webauthn\WebAuthnAdapter;
@@ -11,7 +11,7 @@ use Throwable;
 
 class WebAuthnController
 {
-    public function authenticate()
+    public function authenticate(): ResponseJson
     {
         try {
             $post = trim(file_get_contents('php://input'));
@@ -28,7 +28,7 @@ class WebAuthnController
             $challenge = $_SESSION['webauthn_challenge'];
             $credentialPublicKey = null;
 
-            $pdo = DbConnector::getPdoInstance();
+            $pdo = PdoConnector::getPdoInstance();
 
             $stmt = $pdo->prepare("SELECT publickey, user_id FROM users_webauthn_credentials WHERE credential_id=?");
             $stmt->execute([$post->id]);
@@ -52,12 +52,12 @@ class WebAuthnController
         }
     }
 
-    public function getArgs()
+    public function getArgs(): ResponseJson
     {
         try {
             $WebAuthn = new WebAuthnAdapter($_ENV['APP_NAME'], $_ENV['DOMAIN_NAME']);
             $cmd = filter_input(INPUT_GET, 'cmd');
-            $pdo = DbConnector::getPdoInstance();
+            $pdo = PdoConnector::getPdoInstance();
 
             if ($cmd === 'getRegisterArgs') {
                 #region init user and user_credentials
@@ -93,7 +93,7 @@ class WebAuthnController
         }
     }
 
-    public function register()
+    public function register(): ResponseJson
     {
         try {
             $post = trim(file_get_contents('php://input'));
@@ -102,7 +102,7 @@ class WebAuthnController
             }
 
             if (isset($_SESSION['user_id'])) {
-                $pdo = DbConnector::getPdoInstance();
+                $pdo = PdoConnector::getPdoInstance();
                 $stmt = $pdo->prepare("SELECT id,name FROM users WHERE id=?");
                 $stmt->execute([$_SESSION['user_id']]);
                 $user = $stmt->fetch();
