@@ -2,7 +2,7 @@
 
 namespace App\System\Interfaces;
 
-interface ActiveRecord
+interface ActiveRecordInterface
 {
     public function create(array $data);
 

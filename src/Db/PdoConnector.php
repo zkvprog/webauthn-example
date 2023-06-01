@@ -2,9 +2,9 @@
 
 namespace App\Db;
 
-use App\System\Interfaces\DbConnector;
+use App\System\Interfaces\DbConnectorInterface;
 
-class PdoConnector implements DbConnector
+class PdoConnector implements DbConnectorInterface
 {
     public static function getInstance(): \PDO
     {

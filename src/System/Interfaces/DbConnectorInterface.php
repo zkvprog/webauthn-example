@@ -2,7 +2,7 @@
 
 namespace App\System\Interfaces;
 
-interface DbConnector
+interface DbConnectorInterface
 {
     public static function getInstance();
 }
