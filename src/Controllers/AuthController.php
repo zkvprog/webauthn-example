@@ -4,6 +4,7 @@ namespace App\Controllers;
 
 use App\Exception\ApplicationException;
 use App\Repositories\UserRepository;
+use App\System\DIContainerFacade;
 use App\System\ResponseJson;
 use Throwable;
 
@@ -12,7 +13,7 @@ class AuthController
     public function signup(): ResponseJson
     {
         try {
-            $userRepository = new UserRepository();
+            $userRepository = new UserRepository(DIContainerFacade::get('db'));
             $existingUser = $userRepository->read('name=:name', ['name' => $_POST['username']]);
 
             if (!empty($existingUser)) {
@@ -35,7 +36,7 @@ class AuthController
     public function login(): ResponseJson
     {
         try {
-            $userRepository = new UserRepository();
+            $userRepository = new UserRepository(DIContainerFacade::get('db'));
             $user = $userRepository->read(
                 condition: 'name=:name',
                 params: ['name' => $_POST['username']],

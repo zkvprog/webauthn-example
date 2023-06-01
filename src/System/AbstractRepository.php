@@ -3,18 +3,15 @@
 namespace App\System;
 
 use App\Db\PdoConnector;
-use App\System\Interfaces\ActiveRecord;
-use App\System\Interfaces\DbConnector;
+use App\System\Interfaces\ActiveRecordInterface;
 use PDO;
 
-abstract class AbstractRepository implements ActiveRecord
+abstract class AbstractRepository implements ActiveRecordInterface
 {
     protected string $table;
-    protected PDO $db;
 
-    public function __construct()
+    public function __construct(protected object $db)
     {
-        $this->db = PdoConnector::getInstance();
     }
 
     public function create(array $data): string|false

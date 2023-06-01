@@ -2,12 +2,11 @@
 
 namespace App\Controllers;
 
-use App\Db\PdoConnector;
 use App\Exception\ApplicationException;
+use App\Repositories\UserRepository;
+use App\System\DIContainerFacade;
 use App\System\ResponseJson;
-use App\Webauthn\WebAuthnAdapter;
-use lbuchs\WebAuthn\WebAuthn;
-use Throwable;
+use App\Services\WebAuthnAdapter;
 
 class WebAuthnController
 {
@@ -19,7 +18,8 @@ class WebAuthnController
                 $post = json_decode($post);
             }
 
-            $WebAuthn = new WebAuthn($_ENV['APP_NAME'], $_ENV['DOMAIN_NAME']);
+            $webAuthn = new WebAuthnAdapter(DIContainerFacade::get('webauthn'));
+            //new WebAuthn($_ENV['APP_NAME'], $_ENV['DOMAIN_NAME']);
 
             $clientDataJSON = base64_decode($post->clientDataJSON);
             $authenticatorData = base64_decode($post->authenticatorData);
@@ -28,9 +28,8 @@ class WebAuthnController
             $challenge = $_SESSION['webauthn_challenge'];
             $credentialPublicKey = null;
 
-            $pdo = PdoConnector::getPdoInstance();
-
-            $stmt = $pdo->prepare("SELECT publickey, user_id FROM users_webauthn_credentials WHERE credential_id=?");
+            $db = DIContainerFacade::get('db');
+            $stmt = $db->prepare("SELECT publickey, user_id FROM users_webauthn_credentials WHERE credential_id=?");
             $stmt->execute([$post->id]);
             $credentialInfo = $stmt->fetch();
 
@@ -38,7 +37,7 @@ class WebAuthnController
                 throw new ApplicationException('Public Key for credential ID not found!');
             }
 
-            $result = $WebAuthn->processGet($clientDataJSON, $authenticatorData, $signature, $credentialInfo['publickey'], $challenge, null, 'false');
+            $result = $webAuthn->authenticate($clientDataJSON, $authenticatorData, $signature, $credentialInfo['publickey'], $challenge);
             if ($result) {
                 $_SESSION['user_id'] = $credentialInfo['user_id'];
                 $_SESSION['user_name'] = $credentialInfo['user_id'];
@@ -47,7 +46,7 @@ class WebAuthnController
             }
 
             return new ResponseJson(true, 'got passkey success');
-        } catch (Throwable $ex) {
+        } catch (ApplicationException $ex) {
             return new ResponseJson(false, $ex->getMessage());
         }
     }
@@ -55,28 +54,29 @@ class WebAuthnController
     public function getArgs(): ResponseJson
     {
         try {
-            $WebAuthn = new WebAuthnAdapter($_ENV['APP_NAME'], $_ENV['DOMAIN_NAME']);
+            $WebAuthn = new WebAuthnAdapter(DIContainerFacade::get('webauthn'));
             $cmd = filter_input(INPUT_GET, 'cmd');
-            $pdo = PdoConnector::getPdoInstance();
+            $db = DIContainerFacade::get('db');
 
             if ($cmd === 'getRegisterArgs') {
-                #region init user and user_credentials
                 if ($_SESSION['user_id']) {
-                    $stmt = $pdo->prepare("SELECT id, name, webauthn_id FROM users WHERE id=?");
-                    $stmt->execute([$_SESSION['user_id']]);
-                    $user = $stmt->fetch();
+                    $userRepository = new UserRepository($db);
+                    $user = $userRepository->read(
+                        condition: 'id=:id',
+                        params: ['id' => $_SESSION['user_id']],
+                        readOne: true
+                    );
 
                     $userId = $user['webauthn_id'];
                     $userName = $user['name'];
                     $userDisplayName = $user['name'];
 
-                    $stmt = $pdo->prepare("SELECT credential_id  FROM users_webauthn_credentials WHERE user_id=?");
+                    $stmt = $db->prepare("SELECT credential_id  FROM users_webauthn_credentials WHERE user_id=?");
                     $stmt->execute([$_SESSION['user_id']]);
                     $users_webauthn_credentials = $stmt->fetch();
                 } else {
                     throw new ApplicationException('undefined user');
                 }
-                #endregion
 
                 $args = $WebAuthn->getRegisterArgs($userId, $userName, $userDisplayName);
             } elseif ($cmd === 'getAuthenticateArgs')  {
@@ -88,7 +88,7 @@ class WebAuthnController
             $_SESSION['webauthn_challenge'] = $WebAuthn->getChallenge();
 
             return new ResponseJson(true, 'got passkey success', $args);
-        } catch (Throwable $ex) {
+        } catch (ApplicationException $ex) {
             return new ResponseJson(false, $ex->getMessage());
         }
     }
@@ -102,31 +102,34 @@ class WebAuthnController
             }
 
             if (isset($_SESSION['user_id'])) {
-                $pdo = PdoConnector::getPdoInstance();
-                $stmt = $pdo->prepare("SELECT id,name FROM users WHERE id=?");
-                $stmt->execute([$_SESSION['user_id']]);
-                $user = $stmt->fetch();
+                $db = DIContainerFacade::get('db');
+                $userRepository = new UserRepository($db);
+                $user = $userRepository->read(
+                    condition: 'id=:id',
+                    params: ['id' => $_SESSION['user_id']],
+                    readOne: true
+                );
 
-                if (!$user) {
+                if (empty($user)) {
                     throw new ApplicationException('undefined user');
                 }
 
-                $WebAuthn = new WebAuthnAdapter($_ENV['APP_NAME'], $_ENV['DOMAIN_NAME']);
+                $webAuthn = new WebAuthnAdapter(DIContainerFacade::get('webauthn'));
 
                 $clientDataJSON = base64_decode($post->clientDataJSON);
                 $attestationObject = base64_decode($post->attestationObject);
                 $challenge = $_SESSION['webauthn_challenge'];
 
-                $data = $WebAuthn->register($clientDataJSON, $attestationObject, $challenge);
+                $data = $webAuthn->register($clientDataJSON, $attestationObject, $challenge);
 
-                $stmt = $pdo->prepare("INSERT INTO users_webauthn_credentials (credential_id, user_id, publickey, signature_counter) VALUES(?, ?, ?, ?)");
+                $stmt = $db->prepare("INSERT INTO users_webauthn_credentials (credential_id, user_id, publickey, signature_counter) VALUES(?, ?, ?, ?)");
                 $stmt->execute([$data['credentialId'], $_SESSION['user_id'], $data['credentialPublicKey'], $data['signatureCounter']]);
 
                 return new ResponseJson(true, 'registration passkey success');
             } else {
                 throw new ApplicationException('undefined user');
             }
-        } catch (Throwable $ex) {
+        } catch (ApplicationException $ex) {
             return new ResponseJson(false, $ex->getMessage());
         }
     }
