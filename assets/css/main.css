@@ -60,7 +60,9 @@ button {
 
 .form-error {
     color: red;
-    padding: 5px 0;
+    padding: 10px 10px;
+    background-color: #ffdede;
+    margin: 5px 0;
 }
 
 label {
