@@ -80,7 +80,7 @@ class WebAuthnController
 
                 $args = $WebAuthn->getRegisterArgs($userId, $userName, $userDisplayName);
             } elseif ($cmd === 'getAuthenticateArgs')  {
-                $args = $WebAuthn->getAuthenticateArgs(null);
+                $args = $WebAuthn->getAuthenticateArgs();
             } else {
                 throw new ApplicationException('unknown cmd');
             }

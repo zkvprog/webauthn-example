@@ -31,7 +31,7 @@ abstract class AbstractRepository implements ActiveRecordInterface
         return $this->db->lastInsertId();
     }
 
-    public function read(string $condition = "", array $params = [], ?string $fields = null, bool $readOne = false): array
+    public function read(string $condition = "", array $params = [], ?string $fields = null, bool $readOne = false): array|bool
     {
         $fields ??= '*';
 
