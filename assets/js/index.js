@@ -1,6 +1,7 @@
+import Toastify from "toastify-js";
+
 async function registerUser(event) {
     const form = event.target.closest('form');
-    const errorPanel = form.querySelector('.form-error');
 
     try {
         if (form.checkValidity()) {
@@ -17,17 +18,16 @@ async function registerUser(event) {
                 throw new Error(register.message);
             }
         } else {
-            errorPanel.textContent = 'Check your form';
+            toastError('Check your form');
         }
     } catch(err) {
         console.error(err);
-        errorPanel.textContent = err;
+        toastError(err);
     }
 }
 
 async function authUser(event) {
     const form = event.target.closest('form');
-    const errorPanel = form.querySelector('.form-error')
 
     try {
         if (form.checkValidity()) {
@@ -44,11 +44,11 @@ async function authUser(event) {
                 throw new Error(authResponse.message);
             }
         } else {
-            errorPanel.textContent = 'Check your form';
+            toastError('Check your form');
         }
     } catch(err) {
         console.error(err);
-        errorPanel.textContent = err;
+        toastError(err);
     }
 }
 
@@ -69,6 +69,17 @@ async function logout(event) {
     }
 }
 
+function toastError (error) {
+    Toastify({
+        text: error,
+        duration: -1,
+        close: true,
+        style: {
+            background: "linear-gradient(to right, rgb(255, 95, 109), rgb(255, 195, 113))",
+        }
+    }).showToast();
+}
+
 window.onload = (event) => {
     const registerBtn = document.getElementById("registerBtn");
     const authBtn = document.getElementById("authBtn");
@@ -85,4 +96,12 @@ window.onload = (event) => {
     if (logoutBtn) {
         logoutBtn.addEventListener("click", logout);
     }
+
+    const formContainer = document.getElementById('form-group');
+    document.addEventListener('click', (e) => {
+        if (e.target.classList.contains('slide-up')) {
+            formContainer.querySelectorAll('.form-title').forEach((el) => el.classList.toggle("slide-up"));
+            formContainer.querySelectorAll('.signup, .login').forEach((el) => el.classList.toggle("form-active"));
+        }
+    });
 };
