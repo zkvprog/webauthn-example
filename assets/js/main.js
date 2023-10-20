@@ -1,4 +1,4 @@
-import "../css/main.css"
+import "../css/main.scss"
 import "./index.js";
 
 import {WebAuthnConfig} from './WebAuthnConfig.js';
